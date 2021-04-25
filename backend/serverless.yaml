@@ -1,0 +1,106 @@
+# Name of the stack that will be created in AWS CloudFront
+service: big-eye-muii-project
+
+package:
+  # Files to be excluded (everything but functions)
+  patterns:
+    - '!./**'
+    - functions/**
+
+custom:
+  # AWS Region (Nort Virginia)
+  region: us-east-1
+  # Prefix to name our resources
+  prefix: big-eye-muii-backend
+  # DynamoDB table that will store faceId and logs
+  metadataTable: ${self:custom.prefix}-metadata
+  # DynamoDB table whichs stores user infp
+  userTable: ${self:custom.prefix}-user-info
+  # Bucket on which the faces will be stored
+  faceBucket: ${self:custom.prefix}-face-bucket
+  # Face colletions
+  faceCollection: ${self:custom.prefix}-face-collection
+
+provider:
+  name: aws
+  # API Gateway type
+  endpointType: regional
+  # Lambda runtime configuration
+  runtime: python3.8
+  region: ${self:custom.region}
+  # Lambda timeout to stop execution
+  timeout: 30
+  # Lambda max memory usage
+  memorySize: 128
+  # Environment variables for lambda usage
+  environment:
+    METADATA_TABLE: ${self:custom.metadataTable}
+    USER_TABLE: ${self:custom.userTable}
+    FACE_BUCKET: ${self:custom.faceBucket}
+    FACE_COLLECTION: ${self:custom.faceCollection}
+  lambdaHashingVersion: 20201221
+  # Lambda permissions
+  iam:
+    role:
+      statements:
+        # Allow to get from S3 and Get, query, put and delete from DynamoDB
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+          Resource:
+            - arn:aws:s3:::${self:custom.faceBucket}/*
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.metadataTable}
+            - arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.userTable}
+        - Effect: Allow
+          Action: 
+            - rekognition:SearchFacesByImage
+            - rekognition:ListCollections
+          Resource:
+            - "*"
+
+functions:
+  # FaceMatch function: execute when upload image (face[.]*.png) to S3
+  faceMatch:
+    handler: functions/faceMatch.lambda_handler
+    events:
+      # When specified S3 events, theres no need to explicit create the bucket event at resources
+      - s3:
+          bucket: ${self:custom.faceBucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: face
+            - suffix: .png
+
+# Create extra resources
+resources:
+  Resources:
+    # DynamoDB table
+    MetadataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.metadataTable}
+        # Key-Value pair - key is faceId returned by Rekognition, value is info about user linked with faceId
+        AttributeDefinitions:
+          - AttributeName: faceId
+            AttributeType: S
+          - AttributeName: ts
+            AttributeType: N
+          - AttributeName: fullName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: faceId
+            KeyType: HASH
+          - AttributeName: fullName
+            KeyType: RANGE
+        # Billing - On-demand
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-python-requirements
