@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Auth, Hub, Logger } from 'aws-amplify';
 
+// Cambio de prueba
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

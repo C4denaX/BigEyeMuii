@@ -28,3 +28,5 @@ Amplify.configure({
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+
