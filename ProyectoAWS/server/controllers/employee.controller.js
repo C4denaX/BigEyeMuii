@@ -21,7 +21,7 @@ employeeCtrl.createEmployee = async (req, res) => {
     const employee = new Employee({
         name: req.body.name,
         position: req.body.position,
-        office: req.body.position,
+        office: req.body.office,
         salary: req.body.salary
     });
     await employee.save();
