@@ -1,0 +1,35 @@
+<!-- *********************************************************************************
+ COMPONENTE PRINCIPAL
+********************************************************************************* -->
+
+<!-- Creamos una barra de navegación con Bootstrap -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" *ngIf="usuarioLogueado()">
+  <a [routerLink]="['/usuarios']" class="navbar-brand active" style='font-size: 26px; color: rgb(255, 126, 20);'>Proyecto <i class='fab fa-aws' style='font-size: 24px; color: rgb(255, 126, 20);'></i></a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <li><a id='btnUsuarios' class="nav-item nav-link" routerLink="/usuarios" routerLinkActive="active"> Usuarios y accesos </a></li>
+      <li><a id='btnEmployees' class="nav-item nav-link" routerLink="/employees" routerLinkActive="active"> Empleados[prueba] </a></li>
+    </div>
+
+  <!-- Dropdown -->
+  <div class="navbar-nav ml-auto">
+    <div class="nav-item dropleft">
+      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ email }}
+      </a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <!-- <a class="dropdown-item" href="/config">Configuración</a>
+        <div class="dropdown-divider"></div> -->
+        <a class="dropdown-item" style="cursor: pointer;" (click)="cerrarSesion()">Cerrar sesión</a>
+      </div>
+    </div>
+  </div>
+  </div>
+</nav>
+
+
+
+<router-outlet></router-outlet>

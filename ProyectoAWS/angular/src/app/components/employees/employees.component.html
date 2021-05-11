@@ -1,0 +1,38 @@
+<div class="container">
+    <div class="col s7">
+        <form #employeeForm="ngForm" (ngSubmit)="addEmployee(employeeForm)">
+            <input type="hidden" class="form-control" name="_id" #_id="ngModel" [(ngModel)]="employeeService.selectedEmployee._id">
+            <input type="text" class="form-control" name="name" #name="ngModel" [(ngModel)]="employeeService.selectedEmployee.name" placeholder="Ingresa tu nombre">
+            <input type="text" class="form-control" name="position" #position="ngModel" [(ngModel)]="employeeService.selectedEmployee.position" placeholder="Ingresa tu posición">
+            <input type="text" class="form-control" name="office" #office="ngModel" [(ngModel)]="employeeService.selectedEmployee.office" placeholder="Ingresa tu oficina">
+            <input type="text" class="form-control" name="salary" #salary="ngModel" [(ngModel)]="employeeService.selectedEmployee.salary" placeholder="Ingresa tu salario">
+            
+            <button class="btn btn-primary" (click)="resetForm(employeeForm)">Limpiar</button>
+            <button class="btn btn-success">Guardar</button>
+        </form>
+    </div>
+
+    <br>
+    <div class="col s7">
+        <table class="table table-striped table-dark">
+            <thead>
+                <th>Nombre</th>
+                <th>Posición</th>
+                <th>Oficina</th>
+                <th>Operaciones</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let em of employeeService.employees">
+                    <td>{{ em.name }}</td>
+                    <td>{{ em.position }}</td>
+                    <td>{{ em.office }}</td>
+                    <td>
+                        <a (click)="editEmployee(em)" style="cursor: pointer ;margin-right: 10px; color:rgb(134, 134, 252)">Editar</a>
+                        <a (click)="deleteEmployee(em)" style="cursor: pointer; color: rgb(230, 88, 88);">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+</div>

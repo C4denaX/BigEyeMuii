@@ -1,0 +1,94 @@
+<div class="body">
+    <br>
+    <div class="container">
+      <h3>Usuarios y accesos</h3><br>
+
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <div class="row">
+              <div>
+                <i class='fas fa-search' style='font-size: 20px; color: rgb(32, 32, 32); margin-top: 8px;'></i>
+              </div>
+              <div>
+                <input autocomplete="off" type="text" name="filterUsuario" class="form-control" placeholder="Buscar por nombre" style="width: 300px; margin-left: 13px;" [(ngModel)]="filterUsuario"><br>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TABLA CON LOS DEPORTISTAS -->
+      <div class="row">
+        <!-- <p *ngIf="!hayDeportistas">No tienes deportistas asignados.</p> -->
+        <!-- <table class="table table-striped" *ngIf="hayDeportistas" style="background-color: white;"> -->
+        <table class="table table-striped" style="background-color: white;">
+            <thead class="thead-dark">
+              <tr>
+                  <th>Nº</th>
+                  <th>Nombre</th>
+                  <th>FaceID</th>
+                  <th>Foto</th>
+                  <th>Accesos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- <tr *ngFor="let usuario of usuarioService.usuarios | filter:filterUsuario" (click)="abrirDeportista(deportista)"> -->
+                <tr *ngFor="let usuario of usuarioService.usuarios | filter:filterUsuario; let i=index">
+
+                    <td><b>{{ i+1 }}</b></td>
+                    <td><b>{{ usuario.nombre }}</b></td>
+                    <td>{{ usuario.faceID }}</td>
+                    <td><img src={{usuario.foto}}></td>
+                    <!-- <td>
+                        <p *ngFor="let acceso of json_to_array(usuario['accesos'][0]); let ind=index">{{ ind+1 }}. {{acceso}}</p>
+                    </td> -->
+                    <td>
+                        <p>1. {{ usuario['accesos'][0].acceso1 }}</p>
+                        <p>2. {{ usuario['accesos'][0].acceso2 }}</p>
+                        <p>...</p>
+                        <button (click)="verTodos(verTodosModal, usuario['accesos'][0], usuario.nombre)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
+                    </td>
+                </tr>
+            </tbody>
+          </table>
+      </div>
+
+      
+    </div>
+    </div>
+
+
+
+
+
+    <!-- PARA CREAR EL MODAL CON EL FORMULARIO DE CREAR RUTINA DENTRO -->
+
+    <ng-template #verTodosModal>
+        <div class="modal-header"> 
+            <h4>Todos los accesos de {{ usuario_modal }}</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                <span aria-hidden="true">&times;</span> 
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <table class="table table-striped" style="background-color: white;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Nº acceso</th>
+                            <th>Fecha de acceso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let acceso of accesos_modal; let i=index">
+                            <td><b>{{ i+1 }}</b></td>
+                            <td>{{ acceso }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </ng-template>

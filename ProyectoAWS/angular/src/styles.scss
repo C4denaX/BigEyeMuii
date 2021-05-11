@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+//@import "~bootstrap/dist/css/bootstrap.min.css";
+
+.body-personalizado{
+	background: url(./assets/fondo.jpg) no-repeat center ;
+  	height: 100%;
+    background-size: cover;
+    background-repeat:   no-repeat;
+    background-position: center center;
+    min-height: 100vh; 
+}

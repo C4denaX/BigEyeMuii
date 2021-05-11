@@ -1,0 +1,24 @@
+.ajuste{
+    width: auto;
+    height: 100%;
+    display: inline-block;
+    overflow-x:hidden;
+    border: solid rgb(34, 34, 34);
+    padding: 40px;
+    background-color: rgb(218, 218, 218);
+}
+
+.body{
+	background: url(/../../assets/fondo_login_register.jpg) no-repeat center ;
+  	height: 100%;
+    background-size: cover;
+    background-repeat:   no-repeat;
+    background-position: center center;
+    min-height: 100vh; 
+}
+
+a:hover {
+    color: red;
+    background-color: transparent;
+    text-decoration: underline;
+  }
