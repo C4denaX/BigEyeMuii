@@ -1,0 +1,32 @@
+<div class="body">
+    <br><br><br><br><br>
+    <div class="container">
+        <div class="ajuste">
+            <form [formGroup]="formularioLogin">
+                <h2>Iniciar Sesión</h2><br>
+                <!-- CORREO ELECTRÓNICO -->
+                <div>
+                    <label for="inputEmail">Correo electrónico</label>
+                    <input id="inputEmail" type="text" class="form-control" style="width: 300px;" placeholder="Correo electrónico" formControlName="email">
+                </div><br>
+        
+                <!-- CONTRASEÑA -->
+                <div>
+                    <label for="inputPass">Contraseña</label>
+                    <input id="inputPass" type="password" class="form-control" style="width: 300px;" placeholder="Contraseña" formControlName="password">
+                </div><br>
+
+                <!-- MENSAJE DE ERROR DE AUTENTIFICACIÓN -->
+                <p *ngIf="authError" style="color:red; font-size: 14px">Correo electrónico o contraseña incorrectos.</p>
+
+
+                <!-- BOTÓN SUBMIT -->   
+                <button class="btn btn-primary" [disabled]="!formularioLogin.valid" type="submit" (click)="login()">Iniciar Sesión</button>
+            
+                <!-- BOTÓN REGISTER -->   
+                <br><br>
+                <p style="text-align: center;">¿Eres nuev@? <a style="cursor: pointer; color:blue" href="register">Regístrate</a></p>
+            </form>
+        </div>
+    </div>
+</div>
