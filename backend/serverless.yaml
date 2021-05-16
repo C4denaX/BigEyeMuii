@@ -12,12 +12,12 @@ custom:
   region: us-east-1
   # Prefix to name our resources
   prefix: big-eye-muii-backend
-  # DynamoDB table that will store faceId and logs
-  metadataTable: ${self:custom.prefix}-metadata
-  # DynamoDB table whichs stores user infp
-  userTable: ${self:custom.prefix}-user-info
+  # DynamoDB table that will store access log and user info
+  accessLogTable: ${self:custom.prefix}-access-log
   # Bucket on which the faces will be stored
   faceBucket: ${self:custom.prefix}-face-bucket
+  # Users thumbnail bucket
+  thumbnailBucket: ${self:custom.prefix}-thumbnail-bucket
   # Face colletions
   faceCollection: ${self:custom.prefix}-face-collection
 
@@ -27,6 +27,7 @@ provider:
   endpointType: regional
   # Lambda runtime configuration
   runtime: python3.8
+  stage: dev
   region: ${self:custom.region}
   # Lambda timeout to stop execution
   timeout: 30
@@ -34,9 +35,10 @@ provider:
   memorySize: 128
   # Environment variables for lambda usage
   environment:
-    METADATA_TABLE: ${self:custom.metadataTable}
-    USER_TABLE: ${self:custom.userTable}
+    REGION_NAME: ${self:custom.region}
+    ACCESS_LOG_TABLE: ${self:custom.accessLogTable}
     FACE_BUCKET: ${self:custom.faceBucket}
+    THUMBNAIL_BUCKET: ${self:custom.thumbnailBucket}
     FACE_COLLECTION: ${self:custom.faceCollection}
   lambdaHashingVersion: 20201221
   # Lambda permissions
@@ -51,17 +53,24 @@ provider:
             - arn:aws:s3:::${self:custom.faceBucket}/*
         - Effect: Allow
           Action:
+            - s3:PutObject
+          Resource:
+            - arn:aws:s3:::${self:custom.thumbnailBucket}/*
+        - Effect: Allow
+          Action:
             - dynamodb:GetItem
             - dynamodb:Query
             - dynamodb:PutItem
             - dynamodb:DeleteItem
+            - dynamodb:UpdateItem
+            - dynamodb:Scan
           Resource:
-            - arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.metadataTable}
-            - arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.userTable}
+            - arn:aws:dynamodb:${self:custom.region}:*:table/${self:custom.accessLogTable}
         - Effect: Allow
           Action: 
             - rekognition:SearchFacesByImage
             - rekognition:ListCollections
+            - rekognition:IndexFaces
           Resource:
             - "*"
 
@@ -77,30 +86,41 @@ functions:
           rules:
             - prefix: face
             - suffix: .png
+  getUsers:
+    handler: functions/getUsers.lambda_handler
+    events:
+      - http:
+          path: users
+          method: get
+          cors: true
+  registerUser:
+    handler: functions/registerUser.lambda_handler
+    layers:
+      - arn:aws:lambda:us-east-1:874093745621:layer:sverdejot-pillow:3	
+    events:
+      - http:
+          path: users
+          method: post
+          cors: true
+
 
 # Create extra resources
 resources:
   Resources:
     # DynamoDB table
-    MetadataTable:
+    AccessLogTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.metadataTable}
-        # Key-Value pair - key is faceId returned by Rekognition, value is info about user linked with faceId
+        TableName: ${self:custom.accessLogTable}
         AttributeDefinitions:
           - AttributeName: faceId
-            AttributeType: S
-          - AttributeName: ts
-            AttributeType: N
-          - AttributeName: fullName
             AttributeType: S
         KeySchema:
           - AttributeName: faceId
             KeyType: HASH
-          - AttributeName: fullName
-            KeyType: RANGE
         # Billing - On-demand
         BillingMode: PAY_PER_REQUEST
-
-plugins:
-  - serverless-python-requirements
+    ThumbnailBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.thumbnailBucket}
