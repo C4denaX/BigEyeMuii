@@ -4,7 +4,7 @@ import time
 import boto3
 from boto3.dynamodb.conditions import Key
 
-region = 'us-east-1'
+region = os.environ['REGION_NAME']
 
 def lambda_handler(event, context):
     rek = boto3.client('rekognition', region_name=region)
@@ -35,25 +35,22 @@ def lambda_handler(event, context):
         faceMatch = response['FaceMatches'][0]
 
         dyn = boto3.resource('dynamodb', region_name=region)
-        dyn_log_table = dyn.Table(os.environ['METADATA_TABLE'])
-        dyn_user_table = dyn.Table(os.environ['USER_TABLE'])
-
-        response = dyn_user_table.query(KeyConditionExpression=Key('pk').eq(faceMatch['Face']['FaceId']))
-        userInfo = response.get('Items', [])
-
-        # In case no user was found on database, return HTTP403 FORBIDDEN
-        if not userInfo:
-            return {"statusCode": 403, "message": json.dumps("User not registered") }
-        
-        # Otherwise, return HTTP200 SUCCESSFULL and add entry on log table
+        dyn_log_table = dyn.Table(os.environ['ACCESS_LOG_TABLE'])
 
         # Store user info on new log entry
-        user_log_info = {
-            'faceId': faceMatch['Face']['FaceId'],
-            'ts': time.time_ns(),
-            'fullName': userInfo[0]['fullName']
-        }
-
-        dyn_log_table.put_item(Item=user_log_info)
+        try:
+            dyn_log_table.update_item(
+                Key={
+                    'faceId': faceMatch['Face']['FaceId']
+                },
+                UpdateExpression="SET records = list_append(records, :ts)",
+                ConditionExpression="faceId = :faceId",
+                ExpressionAttributeValues={
+                    ':ts': [json.dumps(round(time.time()*1000))],
+                    ':faceId': faceMatch['Face']['FaceId']
+                }
+            )
+        except Exception:
+            return {"statusCode": 403, "message": json.dumps("User not registered") }
 
         return {"statusCode": 200, "message": json.dumps(f"FaceId [{faceMatch['Face']['FaceId']} was found with {faceMatch['Similarity']:.2f}%]")}
