@@ -32,11 +32,12 @@ export class RegistrarUsuarioComponent implements OnInit {
     this.usuarioService.createUsuario(this.formularioRegistro.value)
       .subscribe(res => {
         this.cargando = false;
-        alert(Object.values(res));
+        //alert(Object.values(res));
         location.reload();
       },
       err => {
-        alert(Object.values(err));
+        this.cargando = false;
+        //alert(Object.values(err));
         location.reload();
       })
   }

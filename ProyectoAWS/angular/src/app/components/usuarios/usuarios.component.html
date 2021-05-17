@@ -54,7 +54,7 @@
                         <p *ngIf="usuario['records'].length > 0"><b>1.</b> {{ usuario['records'][0] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
                         <p *ngIf="usuario['records'].length > 1"><b>2.</b> {{ usuario['records'][1] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
                         <p *ngIf="usuario['records'].length == 0">No existen accesos.</p>
-                      <button *ngIf="usuario['records'].length > 2" (click)="verTodos(verTodosModal, usuario['records'], usuario.name)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
+                      <button *ngIf="usuario['records'].length > 2" (click)="verTodos(verTodosModal, usuario['records'], usuario.name)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos ({{ usuario['records'].length }})</button>
                   </td>
                 </tr>
             </tbody>
