@@ -11,7 +11,10 @@ import { Router } from '@angular/router';
 })
 
 export class AuthService {
-  AUTH_SERVER: string = "http://localhost:3000"
+  readonly URL_API: string = "http://localhost:3000"
+  // readonly URL_API_AWS = '';
+  // readonly URL_API = 'http://localhost:27050'
+
   authSubject = new BehaviorSubject(false);
   private token: string = ""; 
   selectedUsuario: User;
@@ -21,7 +24,7 @@ export class AuthService {
   }
 
   register(user: User): Observable<JwtResponse> {
-    return this.http.post<JwtResponse>(this.AUTH_SERVER + "/register", 
+    return this.http.post<JwtResponse>(this.URL_API + "/register", 
       user).pipe(tap(
         (res:JwtResponse) => {
           if(res) {
@@ -35,7 +38,7 @@ export class AuthService {
 
 
   login(user: User): Observable<JwtResponse> {
-    return this.http.post<JwtResponse>(this.AUTH_SERVER + "/login", 
+    return this.http.post<JwtResponse>(this.URL_API + "/login", 
       user).pipe(tap(
         (res:JwtResponse) => {
           if(res) {

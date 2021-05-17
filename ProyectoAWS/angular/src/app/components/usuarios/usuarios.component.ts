@@ -25,11 +25,17 @@ export class UsuariosComponent implements OnInit {
     this.getUsuarios();
   }
 
+  // getUsuarios() PARA NODEJS
+  // getUsuarios() {
+  //   this.usuarioService.getUsuarios()
+  //     .subscribe(res => {
+  //       this.usuarioService.usuarios = res as Usuario[];
+  //     });
+  // }
+
+  // getUsuarios() PARA DYNAMODB
   getUsuarios() {
-    this.usuarioService.getUsuarios()
-      .subscribe(res => {
-        this.usuarioService.usuarios = res as Usuario[];
-      });
+    this.usuarioService.getUsuarios();
   }
 
 
@@ -42,7 +48,7 @@ export class UsuariosComponent implements OnInit {
 
   json_to_array(accesos: Object): Array<any> {
     var accesos_array: Array<any>;
-    accesos_array = Object.values(accesos)
+    accesos_array = Object.values(accesos);
     return accesos_array
   }
 
