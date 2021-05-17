@@ -14,8 +14,6 @@ custom:
   prefix: big-eye-muii-backend
   # DynamoDB table that will store access log and user info
   accessLogTable: ${self:custom.prefix}-access-log
-  # Bucket on which the faces will be stored
-  faceBucket: ${self:custom.prefix}-face-bucket
   # Users thumbnail bucket
   thumbnailBucket: ${self:custom.prefix}-thumbnail-bucket
   # Face colletions
@@ -37,7 +35,6 @@ provider:
   environment:
     REGION_NAME: ${self:custom.region}
     ACCESS_LOG_TABLE: ${self:custom.accessLogTable}
-    FACE_BUCKET: ${self:custom.faceBucket}
     THUMBNAIL_BUCKET: ${self:custom.thumbnailBucket}
     FACE_COLLECTION: ${self:custom.faceCollection}
   lambdaHashingVersion: 20201221
@@ -49,10 +46,6 @@ provider:
         - Effect: Allow
           Action:
             - s3:GetObject
-          Resource:
-            - arn:aws:s3:::${self:custom.faceBucket}/*
-        - Effect: Allow
-          Action:
             - s3:PutObject
           Resource:
             - arn:aws:s3:::${self:custom.thumbnailBucket}/*
@@ -75,17 +68,15 @@ provider:
             - "*"
 
 functions:
-  # FaceMatch function: execute when upload image (face[.]*.png) to S3
+  # FaceMatch function (compares face with collection): POST requests to /access
   faceMatch:
     handler: functions/faceMatch.lambda_handler
     events:
-      # When specified S3 events, theres no need to explicit create the bucket event at resources
-      - s3:
-          bucket: ${self:custom.faceBucket}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: face
-            - suffix: .png
+      - http:
+          path: access
+          method: POST
+          cors: true
+  # GetUsers function (list all users' info): GET requests to /users
   getUsers:
     handler: functions/getUsers.lambda_handler
     events:
@@ -93,16 +84,17 @@ functions:
           path: users
           method: get
           cors: true
+  # RegisterUser funtion (register username and thumbnail): POST requests to /users
   registerUser:
     handler: functions/registerUser.lambda_handler
     layers:
+      # Pillow library layer
       - arn:aws:lambda:us-east-1:874093745621:layer:sverdejot-pillow:3	
     events:
       - http:
           path: users
           method: post
           cors: true
-
 
 # Create extra resources
 resources:
