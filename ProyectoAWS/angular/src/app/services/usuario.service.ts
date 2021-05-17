@@ -23,7 +23,7 @@ export class UsuarioService {
   // }
 
   getUsuarios() {
-    this.http.get("https://cdljq8eipl.execute-api.us-east-1.amazonaws.com/dev/users")
+    this.http.get("https://8tajq6sq9e.execute-api.us-east-1.amazonaws.com/dev/users")
     .subscribe(res => {
       this.usuarios = Object.values(res)[0];
       console.log(this.usuarios);
@@ -35,18 +35,8 @@ export class UsuarioService {
       "name": usuario_a_registrar.nombre,
       "thumbnail": usuario_a_registrar.foto
     }
-
-    const HTTP_OPTIONS = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Access-Control-Allow-Credentials' : 'true',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, PUT, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
-      })
-    };
-
-    return this.http.post("https://frwofkrya1.execute-api.us-east-1.amazonaws.com/dev/user", dataUser, HTTP_OPTIONS);
+    
+    return this.http.post("https://8tajq6sq9e.execute-api.us-east-1.amazonaws.com/dev/users", dataUser);
   }
 
 }

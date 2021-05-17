@@ -38,9 +38,9 @@
                 <tr *ngFor="let usuario of usuarioService.usuarios | filter:filterUsuario; let i=index">
 
                     <td><b>{{ i+1 }}</b></td>
-                    <td><b>{{ usuario.nombre }}</b></td>
+                    <td><b>{{ usuario.name }}</b></td>
                     <td>{{ usuario.faceId }}</td>
-                    <td><img src={{usuario.foto}} width="150px"></td>
+                    <td><img src="data:image/png;base64,{{usuario.thumbnail}}" width="150px"></td>
                     <!-- <td>
                         <p *ngFor="let acceso of json_to_array(usuario['accesos'][0]); let ind=index">{{ ind+1 }}. {{acceso}}</p>
                     </td> -->
@@ -51,10 +51,10 @@
                         <button (click)="verTodos(verTodosModal, usuario['accesos'][0], usuario.nombre)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
                     </td> -->
                     <td>
-                        <p><b>1.</b> {{ usuario['accesos'][0] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
-                        <p><b>2.</b> {{ usuario['accesos'][0] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
-                        <p>...</p>
-                      <button (click)="verTodos(verTodosModal, usuario['accesos'], usuario.nombre)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
+                        <p *ngIf="usuario['records'].length > 0"><b>1.</b> {{ usuario['records'][0] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
+                        <p *ngIf="usuario['records'].length > 1"><b>2.</b> {{ usuario['records'][1] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
+                        <p *ngIf="usuario['records'].length == 0">No existen accesos.</p>
+                      <button *ngIf="usuario['records'].length > 2" (click)="verTodos(verTodosModal, usuario['records'], usuario.name)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
                   </td>
                 </tr>
             </tbody>
