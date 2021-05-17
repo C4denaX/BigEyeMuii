@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from './services/auth.service';
+import { Auth, Hub, Logger } from 'aws-amplify';
+
 
 @Component({
   selector: 'app-root',
@@ -10,10 +12,29 @@ export class AppComponent {
   title = 'angular';
 
   email: string = "";
+  userName: any = localStorage.getItem("CognitoIdentityServiceProvider.16dqad02dt01tdreihh5le382v.LastAuthUser")
 
   constructor (private authService: AuthService) {
-
+    const listener = (data: any) => console.log(data);
+    Hub.listen('auth', listener);
   }
+
+  private getJwtToken(): Promise<string | void> {
+    return Auth.currentSession()
+      .then(session => session.getIdToken().getJwtToken())
+      .catch(err => console.log(err));
+  }
+
+  public testAPICall(): void {
+    this.getJwtToken()
+      .then(console.log);
+  }
+
+
+
+
+
+
 
   // Función que nos devuelve si el usuario está logueado o no dependiendo si
   // existe el ACCESS_TOKEN.
