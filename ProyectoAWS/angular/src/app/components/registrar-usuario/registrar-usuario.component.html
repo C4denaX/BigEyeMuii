@@ -1,0 +1,48 @@
+<div class="body">
+    <br>
+    <div class="container">
+
+        <div class="row mb-3">
+            <div class="col">
+                <form [formGroup]="formularioRegistro">
+                    <h3>Registrar usuario</h3><br>
+                    <!-- NOMBRE DEL USUARIO -->
+                    <div>
+                        <label for="inputNombre">Nombre</label>
+                        <input id="inputNombre" type="text" class="form-control" style="width: 300px;" placeholder="Nombre del usuario" formControlName="nombre">
+                    </div><br>
+            
+                    <!-- FOTO -->
+                    <div>
+                        <label for="inputFoto">Fotografía del usuario</label>
+                        <input id="inputFoto" type="file" (change)="capturarFile($event)" class="form-control-file" accept="image/*" formControlName="foto">            
+                    </div><br>
+    
+    
+                    <!-- BOTÓN SUBMIT -->   
+                    <button class="btn btn-primary" [disabled]="!formularioRegistro.valid" type="submit" (click)="registrar()">Registrar usuario</button>
+    
+                </form>
+            </div>
+
+            <div class="col">
+                <br>
+                <h5>Previsualización de la fotografía:</h5>
+                <div *ngIf="imagen_codificada">
+                    <img [src]="imagen_codificada" alt="" width="200px"> 
+                </div>
+                <div *ngIf="!imagen_codificada">
+                    <p>Selecciona una imagen para ver la previsualización.</p>
+                </div>
+            </div>
+
+
+
+            
+        </div>   
+    </div>
+</div>
+
+
+
+
