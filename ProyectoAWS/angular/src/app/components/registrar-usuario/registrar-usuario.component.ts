@@ -14,6 +14,7 @@ export class RegistrarUsuarioComponent implements OnInit {
 
   formularioRegistro: FormGroup; // Declaramos nuestro formulario.
   imagen_codificada!: string;
+  cargando: Boolean = false;  
 
 
   constructor(private sanitizer: DomSanitizer, public usuarioService: UsuarioService, private formBuilder: FormBuilder) {
@@ -27,12 +28,14 @@ export class RegistrarUsuarioComponent implements OnInit {
   }
 
   registrar() {
+    this.cargando = true;
     this.usuarioService.createUsuario(this.formularioRegistro.value)
       .subscribe(res => {
-        alert(Object.values(res))
         location.reload();
+        alert(Object.values(res))
       },
       err => {
+        location.reload();
         alert(Object.values(err))
       })
   }

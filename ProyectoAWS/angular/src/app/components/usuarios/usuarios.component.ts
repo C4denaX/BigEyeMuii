@@ -17,6 +17,7 @@ export class UsuariosComponent implements OnInit {
   usuario_modal!: string;
   filterUsuario = '';
   modalRef! : BsModalRef;
+  cargando : Boolean = false;
 
 
   constructor(public usuarioService: UsuarioService, private modalService: BsModalService) { }
@@ -35,7 +36,13 @@ export class UsuariosComponent implements OnInit {
 
   // getUsuarios() PARA DYNAMODB
   getUsuarios() {
-    this.usuarioService.getUsuarios();
+    this.cargando = true;
+    this.usuarioService.getUsuarios()
+      .subscribe(res => {
+        this.cargando = false;
+        this.usuarioService.usuarios = Object.values(res)[0];
+        console.log(this.usuarioService.usuarios);
+      })
   }
 
 
