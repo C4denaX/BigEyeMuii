@@ -39,17 +39,23 @@
 
                     <td><b>{{ i+1 }}</b></td>
                     <td><b>{{ usuario.nombre }}</b></td>
-                    <td>{{ usuario.faceID }}</td>
-                    <td><img src={{usuario.foto}}></td>
+                    <td>{{ usuario.faceId }}</td>
+                    <td><img src={{usuario.foto}} width="150px"></td>
                     <!-- <td>
                         <p *ngFor="let acceso of json_to_array(usuario['accesos'][0]); let ind=index">{{ ind+1 }}. {{acceso}}</p>
                     </td> -->
-                    <td>
+                    <!-- <td>
                         <p>1. {{ usuario['accesos'][0].acceso1 }}</p>
                         <p>2. {{ usuario['accesos'][0].acceso2 }}</p>
                         <p>...</p>
                         <button (click)="verTodos(verTodosModal, usuario['accesos'][0], usuario.nombre)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
-                    </td>
+                    </td> -->
+                    <td>
+                        <p><b>1.</b> {{ usuario['accesos'][0] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
+                        <p><b>2.</b> {{ usuario['accesos'][0] | date : 'dd/MM/yyyy hh:mm:ss' }}</p>
+                        <p>...</p>
+                      <button (click)="verTodos(verTodosModal, usuario['accesos'], usuario.nombre)" data-toggle="modal" data-target=".modalVT" class="btn btn-primary">Ver todos</button>
+                  </td>
                 </tr>
             </tbody>
           </table>
@@ -85,7 +91,7 @@
                     <tbody>
                         <tr *ngFor="let acceso of accesos_modal; let i=index">
                             <td><b>{{ i+1 }}</b></td>
-                            <td>{{ acceso }}</td>
+                            <td>{{ acceso | date : 'dd/MM/yyyy hh:mm:ss' }}</td>
                         </tr>
                     </tbody>
                 </table>
