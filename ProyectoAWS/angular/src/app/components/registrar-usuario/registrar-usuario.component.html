@@ -23,7 +23,15 @@
                     <button class="btn btn-primary" [disabled]="!formularioRegistro.valid" type="submit" (click)="registrar()">Registrar usuario</button>
     
                 </form>
+                <div *ngIf="cargando" style="margin-left: 38px">
+                    <br><br>
+                    <img src="../../../assets/loading.gif" width="70px" alt="">
+                    <p>Cargando...</p>
+                </div>
             </div>
+
+
+
 
             <div class="col">
                 <br>
@@ -35,6 +43,7 @@
                     <p>Selecciona una imagen para ver la previsualización.</p>
                 </div>
             </div>
+
 
 
 

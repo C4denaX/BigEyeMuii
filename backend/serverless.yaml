@@ -1,5 +1,5 @@
 # Name of the stack that will be created in AWS CloudFront
-service: big-eye-muii-project
+service: big-eye-muii-project-dev-test
 
 package:
   # Files to be excluded (everything but functions)
@@ -11,15 +11,23 @@ custom:
   # AWS Region (Nort Virginia)
   region: us-east-1
   # Prefix to name our resources
+
   prefix: big-eye-muii-backend
   # DynamoDB table that will store access log and user info
   accessLogTable: ${self:custom.prefix}-access-log
-  # Bucket on which the faces will be stored
-  faceBucket: ${self:custom.prefix}-face-bucket
+
   # Users thumbnail bucket
   thumbnailBucket: ${self:custom.prefix}-thumbnail-bucket
   # Face colletions
   faceCollection: ${self:custom.prefix}-face-collection
+  exportOutputs:
+    output: 
+      file: ./angular.env
+      format: json
+    include:
+      - UserPoolId
+      - UserPoolClientId
+      - UsersApiEndpoint
 
 provider:
   name: aws
@@ -37,11 +45,24 @@ provider:
   environment:
     REGION_NAME: ${self:custom.region}
     ACCESS_LOG_TABLE: ${self:custom.accessLogTable}
-    FACE_BUCKET: ${self:custom.faceBucket}
     THUMBNAIL_BUCKET: ${self:custom.thumbnailBucket}
     FACE_COLLECTION: ${self:custom.faceCollection}
   lambdaHashingVersion: 20201221
   # Lambda permissions
+  httpApi:
+    cors: true
+    authorizers:
+      serviceAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl: 
+          Fn::Join:
+          - ''
+          - - 'https://cognito-idp.'
+            - '${self:custom.region}'
+            - '.amazonaws.com/'
+            - Ref: serviceUserPool
+        audience:
+          - Ref: serviceUserPoolClient
   iam:
     role:
       statements:
@@ -49,8 +70,9 @@ provider:
         - Effect: Allow
           Action:
             - s3:GetObject
+            - s3:PutObject
           Resource:
-            - arn:aws:s3:::${self:custom.faceBucket}/*
+            - arn:aws:s3:::${self:custom.thumbnailBucket}/*
         - Effect: Allow
           Action:
             - s3:PutObject
@@ -75,34 +97,34 @@ provider:
             - "*"
 
 functions:
-  # FaceMatch function: execute when upload image (face[.]*.png) to S3
+  # FaceMatch function (compares face with collection): POST requests to /access
   faceMatch:
     handler: functions/faceMatch.lambda_handler
     events:
-      # When specified S3 events, theres no need to explicit create the bucket event at resources
-      - s3:
-          bucket: ${self:custom.faceBucket}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: face
-            - suffix: .png
+
+      - http:
+          path: access
+          method: POST
+          cors: true
+  # GetUsers function (list all users' info): GET requests to /users
   getUsers:
     handler: functions/getUsers.lambda_handler
     events:
-      - http:
-          path: users
-          method: get
-          cors: true
+      - httpApi:
+          path: /users
+          method: GET
+          authorizer: serviceAuthorizer
+  # RegisterUser funtion (register username and thumbnail): POST requests to /users
   registerUser:
     handler: functions/registerUser.lambda_handler
     layers:
+      # Pillow library layer
       - arn:aws:lambda:us-east-1:874093745621:layer:sverdejot-pillow:3	
     events:
-      - http:
-          path: users
-          method: post
-          cors: true
-
+      - httpApi:
+          path: /users
+          method: POST
+          authorizer: serviceAuthorizer
 
 # Create extra resources
 resources:
@@ -123,4 +145,71 @@ resources:
     ThumbnailBucket:
       Type: AWS::S3::Bucket
       Properties:
+
         BucketName: ${self:custom.thumbnailBucket}
+    HttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      DependsOn: serviceUserPool
+    serviceUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: service-user-pool-${self:provider.stage}
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes:
+          - email
+    serviceUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: service-user-pool-client-${self:provider.stage}
+        AllowedOAuthFlows:
+          - implicit
+        AllowedOAuthFlowsUserPoolClient: true
+        AllowedOAuthScopes:
+          - phone
+          - email
+          - openid
+          - profile
+          - aws.cognito.signin.user.admin
+        UserPoolId:
+          Ref: serviceUserPool
+        CallbackURLs: 
+          - https://localhost:4200
+        ExplicitAuthFlows:
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        GenerateSecret: false
+        SupportedIdentityProviders: 
+          - COGNITO
+    serviceUserPoolDomain:
+      Type: AWS::Cognito::UserPoolDomain 
+      Properties:
+        UserPoolId: 
+          Ref: serviceUserPool
+        Domain: service-user-pool-domain-${self:provider.stage}-${self:custom.prefix}
+  Outputs:
+    UserPoolId:
+      Value:
+        Ref: serviceUserPool
+      Export:
+        Name: ${self:provider.stage}-poolId
+    UserPoolClientId:
+      Value:
+        Ref: serviceUserPoolClient
+      Export:
+        Name: ${self:provider.stage}-clientId
+    UsersApiEndpoint:
+      Value:
+        Fn::Join:
+        - ""
+        - - "https://"
+          - Ref: HttpApi
+          - ".execute-api."
+          - ${self:provider.region}.
+          - Ref: "AWS::URLSuffix"
+          - "/users"
+      Export:
+        Name: ${self:provider.stage}-userApi
+
+plugins:
+  - serverless-export-outputs

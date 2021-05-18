@@ -2,6 +2,7 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { isObjectType } from 'graphql';
 
 
 
@@ -17,6 +18,7 @@ export class UsuariosComponent implements OnInit {
   usuario_modal!: string;
   filterUsuario = '';
   modalRef! : BsModalRef;
+  cargando : Boolean = false;
 
 
   constructor(public usuarioService: UsuarioService, private modalService: BsModalService) { }
@@ -24,6 +26,8 @@ export class UsuariosComponent implements OnInit {
   ngOnInit(): void {
     this.getUsuarios();
   }
+
+ 
 
   // getUsuarios() PARA NODEJS
   // getUsuarios() {
@@ -34,8 +38,16 @@ export class UsuariosComponent implements OnInit {
   // }
 
   // getUsuarios() PARA DYNAMODB
-  getUsuarios() {
-    this.usuarioService.getUsuarios();
+  async getUsuarios() {
+    this.cargando = true;
+    let token = await this.usuarioService.getJwtToken()
+    this.usuarioService.getUsuarios(token)
+      .subscribe(res => {
+        console.log(res)
+        this.cargando = false;
+        this.usuarioService.usuarios = Object.values(res)[0];
+        console.log(this.usuarioService.usuarios);
+      })
   }
 
 

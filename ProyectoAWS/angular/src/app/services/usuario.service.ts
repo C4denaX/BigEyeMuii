@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http'
 import { Usuario } from '../models/usuario';
+import { Auth, Hub, Logger } from 'aws-amplify';
+import { environment } from '../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +12,10 @@ export class UsuarioService {
 
   selectedUsuario: Usuario;
   usuarios: any;
+  token: string = "";
   readonly URL_API = 'http://localhost:3000/usuarios/';
   // readonly URL_API_AWS = '';
-  // readonly URL_API = 'http://localhost:27050/usuarios'
+  // readonly URL_API = 'http://localhost:27050/usuarios';
 
   constructor(private http: HttpClient) { 
     this.selectedUsuario = new Usuario();
@@ -22,31 +26,26 @@ export class UsuarioService {
   //   return this.http.get(this.URL_API);
   // }
 
-  getUsuarios() {
-    this.http.get("https://cdljq8eipl.execute-api.us-east-1.amazonaws.com/dev/users")
-    .subscribe(res => {
-      this.usuarios = Object.values(res)[0];
-      console.log(this.usuarios);
-    })
+  getUsuarios(token : any) {
+    return this.http.get(environment.UsersApiEndpoint, {headers: new HttpHeaders({'Authorization': "Bearer ".concat(token)})})
   }
 
-  createUsuario(usuario_a_registrar: any) {
+  createUsuario(usuario_a_registrar: any, token: any) {
     var dataUser = {
       "name": usuario_a_registrar.nombre,
       "thumbnail": usuario_a_registrar.foto
     }
-
-    const HTTP_OPTIONS = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Access-Control-Allow-Credentials' : 'true',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, PUT, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
-      })
-    };
-
-    return this.http.post("https://frwofkrya1.execute-api.us-east-1.amazonaws.com/dev/user", dataUser, HTTP_OPTIONS);
+    return this.http.post(environment.UsersApiEndpoint, dataUser, {headers: new HttpHeaders({'Authorization': "Bearer ".concat(token)})});
   }
+
+
+  getJwtToken(): Promise<string | any> {
+    return Auth.currentSession()
+      .then(session => session.getIdToken().getJwtToken())
+      .catch(err => console.log(err));
+  }
+
+
+
 
 }

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { FormGroup, FormControl, Validators, Form, FormBuilder, FormArray, NgForm  } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { RouterModule, Routes } from '@angular/router';
+
 
 
 @Component({
@@ -14,9 +16,10 @@ export class RegistrarUsuarioComponent implements OnInit {
 
   formularioRegistro: FormGroup; // Declaramos nuestro formulario.
   imagen_codificada!: string;
+  cargando: Boolean = false;  
 
 
-  constructor(private sanitizer: DomSanitizer, public usuarioService: UsuarioService, private formBuilder: FormBuilder) {
+  constructor(private sanitizer: DomSanitizer, public usuarioService: UsuarioService, private formBuilder: FormBuilder, private router: RouterModule) {
     this.formularioRegistro = this.formBuilder.group({
       nombre: new FormControl('', Validators.required),
       foto: new FormControl('', Validators.required)
@@ -26,14 +29,19 @@ export class RegistrarUsuarioComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  registrar() {
-    this.usuarioService.createUsuario(this.formularioRegistro.value)
+  async registrar() {
+    this.cargando = true;
+    let token = await this.usuarioService.getJwtToken()
+    this.usuarioService.createUsuario(this.formularioRegistro.value, token)
       .subscribe(res => {
-        alert(Object.values(res))
+        this.cargando = false;
+        alert(Object.values(res));
         location.reload();
       },
       err => {
-        alert(Object.values(err))
+        this.cargando = false;
+        alert(Object.values(err));
+        location.reload();
       })
   }
 

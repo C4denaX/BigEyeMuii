@@ -1,4 +1,6 @@
-import json, boto3, os
+
+import json, boto3, os, base64
+
 from boto3.dynamodb.conditions import Key
 
 def lambda_handler(event, context):
@@ -6,6 +8,9 @@ def lambda_handler(event, context):
 
     # Get DynamoDB resources
     dyn = boto3.resource('dynamodb', region_name=region)
+
+    s3 = boto3.client('s3')
+
     access_log = dyn.Table(os.environ['ACCESS_LOG_TABLE'])
     
     # Scan all items
@@ -13,7 +18,9 @@ def lambda_handler(event, context):
     
     for user in users:
         # Add thumnail URL
-        user['thumbnail'] = f"https://{os.environ['THUMBNAIL_BUCKET']}.s3.amazonaws.com/{user['faceId']}.png"
+        user['thumbnail'] = base64.b64encode(s3.get_object(Bucket=os.environ['THUMBNAIL_BUCKET'], Key=f"{user['faceId']}.png")['Body'].read()).decode('utf-8')
+
+
         user['records'] = [str(record) for record in user['records']]
 
     return {

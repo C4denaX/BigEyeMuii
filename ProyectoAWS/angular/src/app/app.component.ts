@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { Auth, Hub, Logger } from 'aws-amplify';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -8,15 +9,22 @@ import { Auth, Hub, Logger } from 'aws-amplify';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'angular';
 
   email: string = "";
-  userName: any = localStorage.getItem("CognitoIdentityServiceProvider.16dqad02dt01tdreihh5le382v.LastAuthUser")
 
-  constructor (private authService: AuthService) {
-    const listener = (data: any) => console.log(data);
+  constructor (private authService: AuthService, private router: Router) {
+    const listener = (data: any) => {
+      console.log(data);
+      this.router.navigate(['']);
+    }
     Hub.listen('auth', listener);
+  }
+
+
+  ngOnInit(): void {
+    //this.testAPICall();
   }
 
   private getJwtToken(): Promise<string | void> {
