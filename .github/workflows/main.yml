@@ -25,4 +25,4 @@ jobs:
           aws-session-token:  ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
       - name: Serverless Deploy
-        run: cd backend && npm install && npm audit fix && serverless deploy
+        run: npm run-script deploy
