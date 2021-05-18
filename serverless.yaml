@@ -202,11 +202,5 @@ resources:
           - "/users"
       Export:
         Name: ${self:provider.stage}-userApi
-    Region:
-      Value:
-        Ref: ${self:custom.region}
-      Export:
-        Name: ${self:custom.prefix}-region
-
 plugins:
   - serverless-export-outputs
