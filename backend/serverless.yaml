@@ -22,12 +22,13 @@ custom:
   faceCollection: ${self:custom.prefix}-face-collection
   exportOutputs:
     output: 
-      file: ./angular.env
+      file: ../ProyectoAWS/angular/server-envinroment.json
       format: json
     include:
       - UserPoolId
       - UserPoolClientId
       - UsersApiEndpoint
+      - Region
 
 provider:
   name: aws
@@ -210,6 +211,11 @@ resources:
           - "/users"
       Export:
         Name: ${self:provider.stage}-userApi
+    Region:
+      Value:
+        Ref: ${self:custom.region}
+      Export:
+        Name: ${self:custom.prefix}-region
 
 plugins:
   - serverless-export-outputs
