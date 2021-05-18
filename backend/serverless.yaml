@@ -11,9 +11,11 @@ custom:
   # AWS Region (Nort Virginia)
   region: us-east-1
   # Prefix to name our resources
-  prefix: big-eye-muii-backend-dev-test
+
+  prefix: big-eye-muii-backend
   # DynamoDB table that will store access log and user info
   accessLogTable: ${self:custom.prefix}-access-log
+
   # Users thumbnail bucket
   thumbnailBucket: ${self:custom.prefix}-thumbnail-bucket
   # Face colletions
@@ -73,6 +75,11 @@ provider:
             - arn:aws:s3:::${self:custom.thumbnailBucket}/*
         - Effect: Allow
           Action:
+            - s3:PutObject
+          Resource:
+            - arn:aws:s3:::${self:custom.thumbnailBucket}/*
+        - Effect: Allow
+          Action:
             - dynamodb:GetItem
             - dynamodb:Query
             - dynamodb:PutItem
@@ -94,6 +101,7 @@ functions:
   faceMatch:
     handler: functions/faceMatch.lambda_handler
     events:
+
       - http:
           path: access
           method: POST
@@ -137,6 +145,7 @@ resources:
     ThumbnailBucket:
       Type: AWS::S3::Bucket
       Properties:
+
         BucketName: ${self:custom.thumbnailBucket}
     HttpApi:
       Type: AWS::ApiGatewayV2::Api

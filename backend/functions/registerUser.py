@@ -15,13 +15,16 @@ def lambda_handler(event, context):
     response = rek.index_faces(
         CollectionId=os.environ['FACE_COLLECTION'],
         Image={
+
             'Bytes': base64.b64decode(b64_thumbnail.encode('utf-8'))
+
         },
         MaxFaces=1
     )
 
     statusCode = None
     body = None
+
 
     if response['FaceRecords']:
         faceId = response['FaceRecords'][0]['Face']['FaceId']
@@ -55,3 +58,4 @@ def lambda_handler(event, context):
         "statusCode": statusCode if statusCode else 404,
         "body": json.dumps(body if body else "Not found")
     }
+

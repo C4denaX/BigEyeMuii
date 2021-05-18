@@ -4,15 +4,15 @@ applications:
       phases:
         preBuild:
           commands:
-            - npm install
+            - npm ci
         build:
           commands:
             - npm run build
       artifacts:
-        baseDirectory: dist/Big-Eye
+        baseDirectory: dist/angular
         files:
           - '**/*'
       cache:
         paths:
           - node_modules/**/*
-    appRoot: frontend/Big-Eye
+    appRoot: ProyectoAWS/angular
