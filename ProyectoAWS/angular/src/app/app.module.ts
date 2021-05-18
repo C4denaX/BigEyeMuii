@@ -30,8 +30,8 @@ import { AmplifyUIAngularModule } from '@aws-amplify/ui-angular';
 // });
 Amplify.configure({
   region: 'us-east-1',
-  userPoolId: 'us-east-1_AzEXK5bTu',
-  userPoolWebClientId: '2jnq087nl45lrraipb5qeqahno'
+  userPoolId: 'us-east-1_mrqQjCeV7',
+  userPoolWebClientId: '4lml511c18188mu2i254f1nvuq'
 });
 
 

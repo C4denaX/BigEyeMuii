@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Usuario } from '../models/usuario';
+import { Auth, Hub, Logger } from 'aws-amplify';
+
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +11,7 @@ export class UsuarioService {
 
   selectedUsuario: Usuario;
   usuarios: any;
+  token: string = "";
   readonly URL_API = 'http://localhost:3000/usuarios/';
   // readonly URL_API_AWS = '';
   // readonly URL_API = 'http://localhost:27050/usuarios';
@@ -23,7 +26,11 @@ export class UsuarioService {
   // }
 
   getUsuarios() {
-    return this.http.get("https://1o9tlkqjzl.execute-api.us-east-1.amazonaws.com/dev/users")
+    this.testAPICall()
+    // alert(this.testAPICall());
+
+    const headers = new HttpHeaders({'Authorization': "Bearer ".concat(localStorage.getItem('TOKEN') || '{}')});
+    return this.http.get("https://4508do0acj.execute-api.us-east-1.amazonaws.com/users", {headers: headers})
     
   }
 
@@ -33,7 +40,23 @@ export class UsuarioService {
       "thumbnail": usuario_a_registrar.foto
     }
 
-    return this.http.post("https://1o9tlkqjzl.execute-api.us-east-1.amazonaws.com/dev/users", dataUser);
+    const headers = new HttpHeaders({'Authorization': "Bearer ".concat(localStorage.getItem('TOKEN') || '{}')});
+    return this.http.post("https://4508do0acj.execute-api.us-east-1.amazonaws.com/users", dataUser, {headers: headers});
+  }
+
+
+  getJwtToken(): Promise<string | void> {
+    return Auth.currentSession()
+      .then(session => session.getIdToken().getJwtToken())
+      .catch(err => console.log(err));
+  }
+
+  testAPICall(): void {
+    var promesa = Promise.resolve(this.getJwtToken())
+
+    promesa.then(function(value) {
+      localStorage.setItem("TOKEN", (value || '{}'));
+    });
   }
 
 }
