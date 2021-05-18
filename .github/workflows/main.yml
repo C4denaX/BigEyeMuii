@@ -27,4 +27,4 @@ jobs:
       - name: Looking actual directory
         run: pwd && ls backend
       - name: Serverless Deploy
-        run: cd backend && npm install && npm audit fix && serverless deploy
+        run: npm run-script deploy
