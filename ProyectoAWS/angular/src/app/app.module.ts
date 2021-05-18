@@ -28,10 +28,14 @@ import { AmplifyUIAngularModule } from '@aws-amplify/ui-angular';
 //   userPoolId: 'us-east-1_gHvdWWyZb',
 //   userPoolWebClientId: '16dqad02dt01tdreihh5le382v'
 // });
+
+import { environment } from '../environments/environment';
+import { BienvenidaComponent } from './components/bienvenida/bienvenida.component';
+
 Amplify.configure({
-  region: 'us-east-1',
-  userPoolId: 'us-east-1_mrqQjCeV7',
-  userPoolWebClientId: '4lml511c18188mu2i254f1nvuq'
+  region: environment.Region,
+  userPoolId: environment.UserPoolId,
+  userPoolWebClientId: environment.UserPoolClientId
 });
 
 
@@ -43,7 +47,8 @@ Amplify.configure({
     RegisterComponent,
     UsuariosComponent,
     FilterPipe,
-    RegistrarUsuarioComponent
+    RegistrarUsuarioComponent,
+    BienvenidaComponent
   ],
   imports: [
     BrowserModule,
