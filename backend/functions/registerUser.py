@@ -15,9 +15,8 @@ def lambda_handler(event, context):
     response = rek.index_faces(
         CollectionId=os.environ['FACE_COLLECTION'],
         Image={
-
-            'Bytes': base64.b64decode(b64_thumbnail.encode('utf-8'))
-
+            # To avoid Incorrect Padding, add 3 equals (in any other case it will be delete)
+            'Bytes': base64.b64decode(b64_thumbnail.encode('utf-8') + b'===')
         },
         MaxFaces=1
     )

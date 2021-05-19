@@ -1,2 +1,4 @@
 backend/node_modules
 backend/.serverless
+.serverless
+node_modules
