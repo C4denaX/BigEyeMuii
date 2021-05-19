@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { BienvenidaComponent } from './components/bienvenida/bienvenida.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -17,7 +18,8 @@ import { AuthGuardService } from './services/auth-guard.service';
 // ];
 
 const routes: Routes = [
-  { path:'', component: UsuariosComponent },
+  { path:'', component: BienvenidaComponent },
+  { path:'usuarios', component: UsuariosComponent },
   { path:'employees', component: EmployeesComponent },
   { path:'registrarUsuario', component: RegistrarUsuarioComponent }
 ];

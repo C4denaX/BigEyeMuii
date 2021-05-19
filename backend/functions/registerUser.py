@@ -24,6 +24,7 @@ def lambda_handler(event, context):
     statusCode = None
     body = None
 
+
     if response['FaceRecords']:
         faceId = response['FaceRecords'][0]['Face']['FaceId']
         filename = f"{faceId}.png"
@@ -56,3 +57,4 @@ def lambda_handler(event, context):
         "statusCode": statusCode if statusCode else 404,
         "body": json.dumps(body if body else "Not found")
     }
+

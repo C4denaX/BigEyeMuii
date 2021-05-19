@@ -54,6 +54,7 @@ def lambda_handler(event, context):
                     ':faceId': faceMatch['Face']['FaceId']
                 }
             )
+
         # In case of exception (no key was found - user is not registered) returns HTTP403 Forbidden
         except Exception:
             return {

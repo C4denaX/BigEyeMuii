@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http'
 import { Usuario } from '../models/usuario';
 import { Auth, Hub, Logger } from 'aws-amplify';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -25,38 +26,26 @@ export class UsuarioService {
   //   return this.http.get(this.URL_API);
   // }
 
-  getUsuarios() {
-    this.testAPICall()
-    // alert(this.testAPICall());
-
-    const headers = new HttpHeaders({'Authorization': "Bearer ".concat(localStorage.getItem('TOKEN') || '{}')});
-    return this.http.get("https://4508do0acj.execute-api.us-east-1.amazonaws.com/users", {headers: headers})
-    
+  getUsuarios(token : any) {
+    return this.http.get(environment.UsersApiEndpoint, {headers: new HttpHeaders({'Authorization': "Bearer ".concat(token)})})
   }
 
-  createUsuario(usuario_a_registrar: any) {
+  createUsuario(usuario_a_registrar: any, token: any) {
     var dataUser = {
       "name": usuario_a_registrar.nombre,
       "thumbnail": usuario_a_registrar.foto
     }
-
-    const headers = new HttpHeaders({'Authorization': "Bearer ".concat(localStorage.getItem('TOKEN') || '{}')});
-    return this.http.post("https://4508do0acj.execute-api.us-east-1.amazonaws.com/users", dataUser, {headers: headers});
+    return this.http.post(environment.UsersApiEndpoint, dataUser, {headers: new HttpHeaders({'Authorization': "Bearer ".concat(token)})});
   }
 
 
-  getJwtToken(): Promise<string | void> {
+  getJwtToken(): Promise<string | any> {
     return Auth.currentSession()
       .then(session => session.getIdToken().getJwtToken())
       .catch(err => console.log(err));
   }
 
-  testAPICall(): void {
-    var promesa = Promise.resolve(this.getJwtToken())
 
-    promesa.then(function(value) {
-      localStorage.setItem("TOKEN", (value || '{}'));
-    });
-  }
+
 
 }

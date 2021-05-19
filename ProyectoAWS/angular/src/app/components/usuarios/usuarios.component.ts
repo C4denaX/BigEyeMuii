@@ -2,6 +2,7 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { isObjectType } from 'graphql';
 
 
 
@@ -26,6 +27,8 @@ export class UsuariosComponent implements OnInit {
     this.getUsuarios();
   }
 
+ 
+
   // getUsuarios() PARA NODEJS
   // getUsuarios() {
   //   this.usuarioService.getUsuarios()
@@ -35,10 +38,12 @@ export class UsuariosComponent implements OnInit {
   // }
 
   // getUsuarios() PARA DYNAMODB
-  getUsuarios() {
+  async getUsuarios() {
     this.cargando = true;
-    this.usuarioService.getUsuarios()
+    let token = await this.usuarioService.getJwtToken()
+    this.usuarioService.getUsuarios(token)
       .subscribe(res => {
+        console.log(res)
         this.cargando = false;
         this.usuarioService.usuarios = Object.values(res)[0];
         console.log(this.usuarioService.usuarios);

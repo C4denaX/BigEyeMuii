@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { FormGroup, FormControl, Validators, Form, FormBuilder, FormArray, NgForm  } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { RouterModule, Routes } from '@angular/router';
+
 
 
 @Component({
@@ -17,7 +19,7 @@ export class RegistrarUsuarioComponent implements OnInit {
   cargando: Boolean = false;  
 
 
-  constructor(private sanitizer: DomSanitizer, public usuarioService: UsuarioService, private formBuilder: FormBuilder) {
+  constructor(private sanitizer: DomSanitizer, public usuarioService: UsuarioService, private formBuilder: FormBuilder, private router: RouterModule) {
     this.formularioRegistro = this.formBuilder.group({
       nombre: new FormControl('', Validators.required),
       foto: new FormControl('', Validators.required)
@@ -27,17 +29,18 @@ export class RegistrarUsuarioComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  registrar() {
+  async registrar() {
     this.cargando = true;
-    this.usuarioService.createUsuario(this.formularioRegistro.value)
+    let token = await this.usuarioService.getJwtToken()
+    this.usuarioService.createUsuario(this.formularioRegistro.value, token)
       .subscribe(res => {
         this.cargando = false;
-        //alert(Object.values(res));
+        alert(Object.values(res));
         location.reload();
       },
       err => {
         this.cargando = false;
-        //alert(Object.values(err));
+        alert(Object.values(err));
         location.reload();
       })
   }
